@@ -43,8 +43,8 @@ It also includes an **admin panel** for managing users, broadcasting messages, a
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/<yourusername>/what-chats-do-i-own.git
-cd what-chats-do-i-own
+git clone https://github.com/RayanErfan/What-Chats-Do-I-Own.git
+cd What-Chats-Do-I-Own
 ```
 
 ### 2. Install dependencies
