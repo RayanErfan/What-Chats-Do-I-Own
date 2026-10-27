@@ -32,7 +32,7 @@ load_dotenv()
 API_ID = os.getenv('API_ID')
 API_HASH = os.getenv('API_HASH')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
-ADMIN_IDS = os.getenv('ADMIN_IDS', '').split(',')  
+ADMIN_IDS = [x.strip() for x in os.getenv('ADMIN_IDS', '').split(',') if x.strip()]
 
 if not all([API_ID, API_HASH, BOT_TOKEN]):
     raise ValueError("please set API_ID، API_HASH و BOT_TOKEN in .env ")
@@ -309,9 +309,10 @@ def is_admin(user_id):
 
 async def create_stats_chart(stats):
     """ایجاد نمودار آماری برای پنل ادمین و ذخیره به عنوان فایل در حافظه"""
-    # if not HAS_MATPLOTLIB:
-    #     return None
-        
+    if not HAS_MATPLOTLIB:
+        logger.warning("matplotlib is not installed, skipping the stats chart")
+        return None
+
     if stats["daily_new_users"]:
         try:
             days = [record[0] for record in stats["daily_new_users"]]
@@ -396,8 +397,14 @@ async def handle_admin_buttons(event):
 
         chart_buf = await create_stats_chart(stats)
         if chart_buf:
-            await event.respond("📈 نمودار کاربران جدید در هفته گذشته", 
-                            file=chart_buf)            
+            try:
+                await event.respond("📈 نمودار کاربران جدید در هفته گذشته", 
+                                file=chart_buf)
+            finally:
+                # create_stats_chart writes a fixed filename, so clean it up
+                # instead of leaving it for the next admin to overwrite.
+                if os.path.exists(chart_buf):
+                    os.remove(chart_buf)
         return
     elif button_text == "📤 ارسال پیام به همه":
         ADMIN_STATE[user_id]["state"] = "broadcast_message"

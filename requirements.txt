@@ -1,0 +1,8 @@
+telethon
+pandas
+matplotlib
+python-dotenv
+
+# pd.ExcelWriter(..., engine="xlsxwriter") in the activity report needs this,
+# even though no module imports it directly.
+xlsxwriter
